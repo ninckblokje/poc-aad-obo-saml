@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serviceAudience": {
+            "value": "[SERVICE_AUDIENCE]"
+        },
+        "serviceUrl": {
+            "value": "[SERVICE_URL]"
+        },
+        "clientId": {
+            "value": "[CLIENT_ID]]"
+        },
+        "clientSecret": {
+            "value": "[CLIENT_SECRET]"
+        },
+        "clientAudience": {
+            "value": "[CLIENT_AUDIENCE]"
+        },
+        "scope": {
+            "value": "[SCOPE]"
+        },
+        "tenantId": {
+            "value": "[TENANT_ID]"
+        }
+    }
+}

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2023, ninckblokje
+  All rights reserved.
+  
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+  
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+  
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<policies>
+    <inbound>
+        <base />
+        <cors allow-credentials="true">
+            <allowed-origins>
+                <origin>http://localhost:8080</origin>
+            </allowed-origins>
+            <allowed-methods>
+                <method>GET</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>Authorization</header>
+            </allowed-headers>
+        </cors>
+        <validate-azure-ad-token tenant-id="{{httpReceiverSamlApiTenantId}}">
+            <client-application-ids>
+                <application-id>{{httpReceiverSamlApiClientId}}</application-id>
+            </client-application-ids>
+            <audiences>
+                <audience>{{httpReceiverSamlApiClientAudience}}</audience>
+            </audiences>
+            <required-claims>
+                <claim name="scp" match="any" separator="|">
+                    <value>{{httpReceiverSamlApiScope}}</value>
+                </claim>
+            </required-claims>
+        </validate-azure-ad-token>
+        <set-variable name="originalBearerToken" value="@(context.Request.Headers.GetValueOrDefault(&quot;Authorization&quot;, &quot;empty_token&quot;).Split(' ')[1].ToString())" />
+        <send-request mode="new" response-variable-name="oboSamlBearerToken" timeout="5" ignore-error="false">
+            <set-url>https://login.microsoftonline.com/{{httpReceiverSamlApiTenantId}}/oauth2/v2.0/token</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/x-www-form-urlencoded</value>
+            </set-header>
+            <set-body>@{
+                return "client_id={{httpReceiverSamlApiClientId}}&amp;scope={{httpReceiverSamlApiServiceAudience}}/{{httpReceiverSamlApiScope}}&amp;client_secret={{httpReceiverSamlApiClientSecret}}&amp;assertion="+(string)context.Variables["originalBearerToken"]+"&amp;grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&amp;requested_token_use=on_behalf_of&amp;requested_token_type=urn:ietf:params:oauth:token-type:saml2";
+            }</set-body>
+        </send-request>
+        <set-variable name="samlBearerToken" value="@((String)((IResponse)context.Variables[&quot;oboSamlBearerToken&quot;]).Body.As&lt;JObject&gt;()[&quot;access_token&quot;])" />
+        <set-header name="Authorization" exists-action="override">
+            <value>@("Bearer " + (string)context.Variables["samlBearerToken"])</value>
+        </set-header>
+        <set-header name="Test" exists-action="override">
+            <value>@(((string)context.Variables["samlBearerToken"]).Substring(0, 40))</value>
+        </set-header>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

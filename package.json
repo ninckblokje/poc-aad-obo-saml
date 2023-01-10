@@ -1,0 +1,14 @@
+{
+  "name": "poc-aad-obo-saml",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "serve": "http-server dist"
+  },
+  "author": "ninckblokje",
+  "license": "BSD-2-Clause",
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

@@ -1,0 +1,6 @@
+export const config = {
+    apiUrl: API_URL,
+    clientId: CLIENT_ID,
+    scopes: [ ARRAY_OF_SCOPES ],
+    tenantId: TENANT_ID,
+}
