@@ -12,14 +12,15 @@ This proof of concept consists of two parts:
 1. API configuration (using Bicep) for Azure API Management
     - See [my-azure-env](https://github.com/ninckblokje/my-azure-env/) for the Azure API Management definition
 
-Two app registrations are required in Azure AD:
+Three app registrations are required in Azure AD:
 1. For a fictive backend
    - With a scope called `Scope.Dummy`
-1. For this client and Azure API Management
-   - Configured as SPA with a redirect URL to: http://localhost:8080/blank.html
-   - With a secret (for Azure API Management)
+1. For Azure API Management
+   - With a secret
    - With a scope called `Scope.Dummy`
    - With permissions to call the scope `Scope.Dummy` on the previous app registration as delegate
+1. For this client
+   - Configured as SPA with a redirect URL to: http://localhost:8080/blank.html
 
 To run this proof of concept:
 1. Run `npm install`

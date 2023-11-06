@@ -40,7 +40,7 @@
         </cors>
         <validate-azure-ad-token tenant-id="{{httpReceiverSamlApiTenantId}}">
             <client-application-ids>
-                <application-id>{{httpReceiverSamlApiClientId}}</application-id>
+                <application-id>{{httpReceiverSamlApiFrontendClientId}}</application-id>
             </client-application-ids>
             <audiences>
                 <audience>{{httpReceiverSamlApiClientAudience}}</audience>

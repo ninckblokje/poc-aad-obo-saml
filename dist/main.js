@@ -44,7 +44,7 @@ const data = {
 window.authenticateWithAad = async function() {
   console.log("Authenticating with AAD")
   try {
-      data.loginResponse = await msalInstance.loginPopup({})
+      data.loginResponse = await msalInstance.loginPopup({}).then(response => msalInstance.setActiveAccount(response.account))
   } catch (err) {
       console.error(err)
   }
@@ -53,8 +53,16 @@ window.authenticateWithAad = async function() {
 window.acquireTokenFromAad = async function() {
   console.log("Acquiring token from AAD")
   try {
-      data.tokenResponse = await msalInstance.acquireTokenPopup({
+      data.tokenResponse = await msalInstance.acquireTokenSilent({
           scopes: config.scopes
+      }).catch(async (err) => {
+        if (err.name === "InteractionRequiredAuthError") {
+          return msalInstance.acquireTokenPopup({
+            scopes: config.scopes
+          })
+        } else {
+          throw err
+        }
       })
   } catch (err) {
       console.error(err)

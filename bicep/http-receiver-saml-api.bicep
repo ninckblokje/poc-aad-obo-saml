@@ -35,6 +35,8 @@ param clientSecret string = ''
 
 param clientAudience string = ''
 
+param frontendClientId string = ''
+
 param scope string = ''
 
 param tenantId string = ''
@@ -95,6 +97,15 @@ resource serviceAudienceNV 'Microsoft.ApiManagement/service/namedValues@2021-08-
   properties: {
     displayName: 'httpReceiverSamlApiServiceAudience'
     value: serviceAudience
+  }
+}
+
+resource frontendClientIdNV 'Microsoft.ApiManagement/service/namedValues@2022-08-01' = {
+  name: 'httpReceiverSamlApiFrontendClientId'
+  parent: jnbApim
+  properties: {
+    displayName: 'httpReceiverSamlApiFrontendClientId'
+    value: frontendClientId
   }
 }
 
